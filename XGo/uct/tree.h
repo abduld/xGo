@@ -13,7 +13,7 @@
 
 namespace Go
 {
-	namespace UCT 
+	namespace UCT
 	{
 #define NODE_FOR_EACH_CHILD(node, act_node, block) TreeNode *_p = child; while(_p) { \
 		TreeNode &act_node = *_p; \
@@ -45,9 +45,9 @@ namespace Go
 				val = 0;
 				playCnt = 0;
 			}
-			~TreeNode () {
+			~TreeNode() {
 				TreeNode *p = child;
-				while(p) {
+				while (p) {
 					TreeNode *q = p;
 					p = p->brother;
 					delete q;
@@ -56,14 +56,21 @@ namespace Go
 
 			float value(bool onlyWin = true) const {
 				if (onlyWin)
-					return float(win)/playCnt;
+					return float(win) / playCnt;
 				else
 					return val;
 			}
 			float UCB() const {
-				if (playCnt == 0)
-					return MAX_UCB + rand() % 1000;
-				return value() + std::sqrt(ExploreRate * std::log(parent->playCnt) / playCnt);
+				if (playCnt == 0) {
+					int r = rand();
+					if (omp_get_thread_num() != 0)
+					{
+						r += omp_get_thread_num() * 1664525 + 1013904223;
+					}
+					r %= 1000;
+					return (float)(MAX_UCB + r);
+				}
+				return value() + (float) std::sqrt(ExploreRate * std::log(parent->playCnt) / playCnt);
 			}
 			bool is_root() const {
 				return parent == NULL;
@@ -74,8 +81,8 @@ namespace Go
 			bool is_mature() const {
 				return playCnt > ExpandThrehold;
 			}
-			TreeNode *get_father() const {return parent;}
-			Point get_move() const {return move;}
+			TreeNode *get_father() const { return parent; }
+			Point get_move() const { return move; }
 			TreeNode* get_child(Point move) const {
 				NODE_FOR_EACH_CHILD(this, node, {
 					if (node.move == move)
@@ -99,7 +106,7 @@ namespace Go
 					child = p->brother;
 				else {
 					TreeNode *q = p->brother;
-					while(q) {
+					while (q) {
 						if (q == node) {
 							p->brother = q->brother;
 							break;
@@ -128,7 +135,7 @@ namespace Go
 					});
 				}
 				else
-					val = (playCnt * val + newVal) / (playCnt+1);
+					val = (playCnt * val + newVal) / (playCnt + 1);
 				playCnt++;
 
 				if (parent != NULL)
@@ -182,10 +189,33 @@ namespace Go
 
 				return ret;
 			}
+#define NUM_THREADS 8
 			// simulate the board with monteCarlo algorithm
 			float monteCarlo(MonteCarlo &board, Policy &policy) {
-				MonteCarlo simulator(board);
-				return simulator.simulate(policy, color);
+				float res = 0;
+				int idx = 0;
+				float evals[NUM_THREADS];
+				MonteCarlo boards[NUM_THREADS];
+				for (int ii = 0; ii < NUM_THREADS; ii++)
+				{
+					boards[ii] = board;
+				}
+#pragma omp parallel for num_threads(NUM_THREADS)
+				for (int ii = 0; ii < NUM_THREADS; ii++) {
+					MonteCarlo sim(boards[omp_get_thread_num()]);
+					evals[ii] = sim.simulate(policy, color);
+				}
+				res = evals[0];
+				idx = 0;
+				for (int ii =1; ii < NUM_THREADS; ii++)
+				{if (evals[ii] > res)
+					{
+						res = evals[ii];
+						idx = ii;
+					}
+				}
+				board = boards[idx];
+				return res;
 			}
 		};
 	}

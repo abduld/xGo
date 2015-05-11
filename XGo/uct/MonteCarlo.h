@@ -10,6 +10,7 @@
 #include <algorithm>
 #include "../naiveSimulator.h"
 #include "policy.h"
+#include <omp.h>
 
 namespace Go
 {
@@ -17,11 +18,11 @@ namespace Go
 		class MonteCarlo : public NaiveSimulator
 		{
 			friend class TreeNode;
-			
+
 			static const int MAX_SIMULATE_STEP = 1000;
 		public:
 			MonteCarlo() {}
-			MonteCarlo(MonteCarlo &other):NaiveSimulator(other) {}
+			MonteCarlo(MonteCarlo &other) :NaiveSimulator(other) {}
 			MonteCarlo& operator=(MonteCarlo &other) {
 				NaiveSimulator::operator=(other);
 				return *this;
@@ -30,7 +31,7 @@ namespace Go
 			override std::string get_name() { return "MonteCarlo"; }
 			override Point generate_move(int color) {
 				/*MonteCarlo simulator;
-				
+
 				std::vector<Point> moves = generate_good_moves(color);
 				Point best(-1, -1);
 				float best_value = -1;
@@ -53,27 +54,28 @@ namespace Go
 				int now_color = color;
 				bool isPass = false;
 				//int sum = 0, simulateCnt = 0;
-				for (int i = 0; i < MAX_SIMULATE_STEP; i++) {
-					//int now = clock();
-					//simulateCnt++;
-					Point move = policy.next_simulate(*this, now_color);
-					//sum += clock()-now;
-					if (pass_move(move)) {
-						if (isPass)
-							break;
-						else
-							isPass = true;
-					}
-					else {
-						isPass = false;
-						
-						play_move(move, now_color);
-					}
-					now_color = other_color(now_color);
-				}
-				//printf("generate time cost: %f (%d)\n", (float)sum/CLOCKS_PER_SEC, simulateCnt);
 
-				return policy.evaluate(*this, color);
+					for (int i = 0; i < MAX_SIMULATE_STEP; i++) {
+						//int now = clock();
+						//simulateCnt++;
+						Point move = policy.next_simulate(*this, now_color);
+						//sum += clock()-now;
+						if (pass_move(move)) {
+							if (isPass)
+								break;
+							else
+								isPass = true;
+						}
+						else {
+							isPass = false;
+
+							play_move(move, now_color);
+						}
+						now_color = other_color(now_color);
+					}
+					//printf("generate time cost: %f (%d)\n", (float)sum/CLOCKS_PER_SEC, simulateCnt);
+
+					return policy.evaluate(*this, color);
 			}
 		};
 	}

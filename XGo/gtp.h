@@ -15,6 +15,10 @@
 #include <cassert>
 #include "engine.h"
 
+#ifdef _MSC_VER
+#define _CRT_SECURE_NO_WARNINGS
+#endif
+
 namespace Go
 {
 	class GTP
@@ -25,8 +29,8 @@ namespace Go
 		// Constants & Codes
 		static const int GTP_BUFSIZE = 1000;
 
-		enum GtpStatus{GTP_QUIT=-1, GTP_OK=0, GTP_FATAL=1};
-		enum GtpRetCode{GTP_SUCCESS=0, GTP_FAILURE=1};
+		enum GtpStatus { GTP_QUIT = -1, GTP_OK = 0, GTP_FATAL = 1 };
+		enum GtpRetCode { GTP_SUCCESS = 0, GTP_FAILURE = 1 };
 
 		// GTP Variables
 		int current_id;
@@ -37,7 +41,7 @@ namespace Go
 
 		// implement singleton
 		static GTP *_instance;
-		GTP():engine(NULL) {}
+		GTP() :engine(NULL) {}
 		~GTP() {
 			if (engine != NULL) {
 				delete engine;
@@ -57,23 +61,23 @@ namespace Go
 				delete this->engine;
 			this->engine = engine;
 
-			commands["protocol_version"]	= std::bind(&GTP::gtp_protocol_version, this, std::placeholders::_1);
-			commands["name"]				= std::bind(&GTP::gtp_name, this, std::placeholders::_1);
-			commands["version"]				= std::bind(&GTP::gtp_version, this, std::placeholders::_1);
-			commands["known_command"]		= std::bind(&GTP::gtp_known_command, this, std::placeholders::_1);
-			commands["list_commands"]		= std::bind(&GTP::gtp_list_commands, this, std::placeholders::_1);
-			commands["quit"]				= std::bind(&GTP::gtp_quit, this, std::placeholders::_1);
-			commands["boardsize"]			= std::bind(&GTP::gtp_boardsize, this, std::placeholders::_1);
-			commands["clear_board"]			= std::bind(&GTP::gtp_clear_board, this, std::placeholders::_1);
-			commands["komi"]				= std::bind(&GTP::gtp_komi, this, std::placeholders::_1);
-			commands["fixed_handicap"]		= std::bind(&GTP::gtp_fixed_handicap, this, std::placeholders::_1);
-			commands["place_free_handicap"]	= std::bind(&GTP::gtp_place_free_handicap, this, std::placeholders::_1);
-			commands["set_free_handicap"]	= std::bind(&GTP::gtp_set_free_handicap, this, std::placeholders::_1);
-			commands["play"]				= std::bind(&GTP::gtp_play, this, std::placeholders::_1);
-			commands["genmove"]				= std::bind(&GTP::gtp_genmove, this, std::placeholders::_1);
-			commands["final_score"]			= std::bind(&GTP::gtp_final_score, this, std::placeholders::_1);
-			commands["final_status_list"]	= std::bind(&GTP::gtp_final_status_list, this, std::placeholders::_1);
-			commands["showboard"]			= std::bind(&GTP::gtp_showboard, this, std::placeholders::_1);
+			commands["protocol_version"] = std::bind(&GTP::gtp_protocol_version, this, std::placeholders::_1);
+			commands["name"] = std::bind(&GTP::gtp_name, this, std::placeholders::_1);
+			commands["version"] = std::bind(&GTP::gtp_version, this, std::placeholders::_1);
+			commands["known_command"] = std::bind(&GTP::gtp_known_command, this, std::placeholders::_1);
+			commands["list_commands"] = std::bind(&GTP::gtp_list_commands, this, std::placeholders::_1);
+			commands["quit"] = std::bind(&GTP::gtp_quit, this, std::placeholders::_1);
+			commands["boardsize"] = std::bind(&GTP::gtp_boardsize, this, std::placeholders::_1);
+			commands["clear_board"] = std::bind(&GTP::gtp_clear_board, this, std::placeholders::_1);
+			commands["komi"] = std::bind(&GTP::gtp_komi, this, std::placeholders::_1);
+			commands["fixed_handicap"] = std::bind(&GTP::gtp_fixed_handicap, this, std::placeholders::_1);
+			commands["place_free_handicap"] = std::bind(&GTP::gtp_place_free_handicap, this, std::placeholders::_1);
+			commands["set_free_handicap"] = std::bind(&GTP::gtp_set_free_handicap, this, std::placeholders::_1);
+			commands["play"] = std::bind(&GTP::gtp_play, this, std::placeholders::_1);
+			commands["genmove"] = std::bind(&GTP::gtp_genmove, this, std::placeholders::_1);
+			commands["final_score"] = std::bind(&GTP::gtp_final_score, this, std::placeholders::_1);
+			commands["final_status_list"] = std::bind(&GTP::gtp_final_status_list, this, std::placeholders::_1);
+			commands["showboard"] = std::bind(&GTP::gtp_showboard, this, std::placeholders::_1);
 		}
 		void run(FILE *gtp_input, FILE *gtp_dump_commands) {
 			char line[GTP_BUFSIZE];
@@ -140,12 +144,12 @@ namespace Go
 
 	public:
 		/*
-	     * GTP Command Handlers
+		 * GTP Command Handlers
 		 */
-		/* We are talking version 2 of the protocol. */
+		 /* We are talking version 2 of the protocol. */
 		int gtp_protocol_version(char *s)
 		{
-		  return gtp_success("2");
+			return gtp_success("2");
 		}
 		int gtp_name(char *s)
 		{
@@ -163,7 +167,7 @@ namespace Go
 			* fails according to specification).
 			*/
 			if (sscanf(s, "%s", command_name) < 1)
-			return gtp_success("false");
+				return gtp_success("false");
 
 			if (commands.find(command_name) != commands.end())
 				return gtp_success("true");
@@ -189,14 +193,14 @@ namespace Go
 			int boardsize;
 
 			if (sscanf(s, "%d", &boardsize) < 1)
-			return gtp_failure("boardsize not an integer");
-  
+				return gtp_failure("boardsize not an integer");
+
 			if (boardsize < MIN_BOARD || boardsize > MAX_BOARD)
-			return gtp_failure("unacceptable size");
+				return gtp_failure("unacceptable size");
 
 			engine->set_board_size(boardsize);
 			engine->init();
-  
+
 			return gtp_success("");
 		}
 		int gtp_clear_board(char *s)
@@ -208,79 +212,79 @@ namespace Go
 		{
 			float komi = 0;
 			if (sscanf(s, "%f", &komi) < 1)
-			return gtp_failure("komi not a float");
-			
+				return gtp_failure("komi not a float");
+
 			engine->set_komi(komi);
 			return gtp_success("");
 		}
 		int gtp_fixed_handicap(char *s)
 		{
-		  return place_handicap(s, 1);
+			return place_handicap(s, 1);
 		}
 		int gtp_place_free_handicap(char *s)
 		{
-		  return place_handicap(s, 0);
+			return place_handicap(s, 0);
 		}
 		int gtp_set_free_handicap(char *s)
 		{
-		  int i, j;
-		  int n;
-		  int handicap = 0;
-  
-		  if (!engine->board_empty())
-			return gtp_failure("board not empty");
+			int i, j;
+			int n;
+			int handicap = 0;
 
-		  while ((n = gtp_decode_coord(s, &i, &j)) > 0) {
-			s += n;
-    
-			if (engine->get_board(Point(i, j)) != EMPTY) {
-			  engine->clear_board();
-			  return gtp_failure("repeated vertex");
+			if (!engine->board_empty())
+				return gtp_failure("board not empty");
+
+			while ((n = gtp_decode_coord(s, &i, &j)) > 0) {
+				s += n;
+
+				if (engine->get_board(Point(i, j)) != EMPTY) {
+					engine->clear_board();
+					return gtp_failure("repeated vertex");
+				}
+
+				engine->play_move(Point(i, j), BLACK);
+				handicap++;
 			}
 
-			engine->play_move(Point(i, j), BLACK);
-			handicap++;
-		  }
+			if (sscanf(s, "%*s") != EOF) {
+				engine->clear_board();
+				return gtp_failure("invalid coordinate");
+			}
 
-		  if (sscanf(s, "%*s") != EOF) {
-			  engine->clear_board();
-			  return gtp_failure("invalid coordinate");
-		  }
+			if (handicap < 2 || handicap >= engine->get_board_size() * engine->get_board_size()) {
+				engine->clear_board();
+				return gtp_failure("invalid handicap");
+			}
 
-		  if (handicap < 2 || handicap >= engine->get_board_size() * engine->get_board_size()) {
-			  engine->clear_board();
-			  return gtp_failure("invalid handicap");
-		  }
-
-		  return gtp_success("");
+			return gtp_success("");
 		}
 		int gtp_play(char *s)
 		{
-		  int i, j;
-		  int color = EMPTY;
+			int i, j;
+			int color = EMPTY;
 
-		  if (!gtp_decode_move(s, &color, &i, &j))
-			return gtp_failure("invalid color or coordinate");
-		  
-		  if (!engine->legal_move(Point(i, j), color)) 
-			return gtp_failure("illegal move");
+			if (!gtp_decode_move(s, &color, &i, &j))
+				return gtp_failure("invalid color or coordinate");
 
-		  engine->play_move(Point(i, j), color);
-		  return gtp_success("");
+			if (!engine->legal_move(Point(i, j), color))
+				return gtp_failure("illegal move");
+
+			engine->play_move(Point(i, j), color);
+			return gtp_success("");
 		}
 		int gtp_genmove(char *s)
 		{
-		  int color = EMPTY;
+			int color = EMPTY;
 
-		  if (!gtp_decode_color(s, &color))
-			return gtp_failure("invalid color");
+			if (!gtp_decode_color(s, &color))
+				return gtp_failure("invalid color");
 
-		  Point p = engine->generate_move(color);
-		  engine->play_move(p, color);
+			Point p = engine->generate_move(color);
+			engine->play_move(p, color);
 
-		  gtp_start_response(GTP_SUCCESS);
-		  gtp_mprintf("%m", p.r, p.c);
-		  return gtp_finish_response();
+			gtp_start_response(GTP_SUCCESS);
+			gtp_mprintf("%m", p.r, p.c);
+			return gtp_finish_response();
 		}
 		int gtp_final_score(char *s)
 		{
@@ -299,7 +303,7 @@ namespace Go
 						score--;
 					else
 						score++;
-			}
+				}
 
 			if (score > 0.0)
 				return gtp_success("W+%3.1f", score);
@@ -334,48 +338,48 @@ namespace Go
 			first_string = 1;
 			for (i = 0; i < engine->get_board_size(); i++)
 				for (j = 0; j < engine->get_board_size(); j++)
-					if (engine->get_final_status(Point(i, j)) == status) 
-					{
-						int k;
-						int stonei[MAX_BOARD * MAX_BOARD];
-						int stonej[MAX_BOARD * MAX_BOARD];
-						std::vector<Point> stones = engine->get_string(Point(i, j));
-						int num_stones = stones.size();
-						/* Clear the status so we don't find the string again. */
-						for (k = 0; k < num_stones; k++) {
-							stonei[k] = stones[k].r, stonej[k] = stones[k].c;
-							engine->set_final_status(stones[k], UNKNOWN);
-						}
-
-						if (first_string)
-							first_string = 0;
-						else
-							gtp_printf("\n");
-	
-						gtp_print_vertices(num_stones, stonei, stonej);
+				if (engine->get_final_status(Point(i, j)) == status)
+				{
+					int k;
+					int stonei[MAX_BOARD * MAX_BOARD];
+					int stonej[MAX_BOARD * MAX_BOARD];
+					std::vector<Point> stones = engine->get_string(Point(i, j));
+					int num_stones = (int) stones.size();
+					/* Clear the status so we don't find the string again. */
+					for (k = 0; k < num_stones; k++) {
+						stonei[k] = stones[k].r, stonej[k] = stones[k].c;
+						engine->set_final_status(stones[k], UNKNOWN);
 					}
+
+					if (first_string)
+						first_string = 0;
+					else
+						gtp_printf("\n");
+
+					gtp_print_vertices(num_stones, stonei, stonej);
+				}
 
 			return gtp_finish_response();
 		}
 		int gtp_showboard(char *s)
 		{
 			int i, j;
-			int symbols[3] = {'.', 'O', 'X'};
-  
+			int symbols[3] = { '.', 'O', 'X' };
+
 			gtp_start_response(GTP_SUCCESS);
 			gtp_printf("\n");
 
 			letters();
-  
+
 			for (i = 0; i < engine->get_board_size(); i++) {
 				printf("\n%2d", engine->get_board_size() - i);
-    
+
 				for (j = 0; j < engine->get_board_size(); j++)
 					printf(" %c", symbols[engine->get_board(Point(i, j))]);
 
 				printf(" %d", engine->get_board_size() - i);
 			}
-  
+
 			printf("\n");
 			letters();
 			return gtp_finish_response();
@@ -448,10 +452,10 @@ namespace Go
 			if (sscanf(s, " %c%d%n", &column, &row, &n) != 2)
 				return 0;
 
-			if (tolower((int) column) == 'i')
+			if (tolower((int)column) == 'i')
 				return 0;
-			*j = tolower((int) column) - 'a';
-			if (tolower((int) column) > 'i')
+			*j = tolower((int)column) - 'a';
+			if (tolower((int)column) > 'i')
 				--*j;
 
 			*i = engine->get_board_size() - row;
@@ -482,48 +486,48 @@ namespace Go
 				if (*fmt == '%') {
 					switch (*++fmt) {
 					case 'c':
-						{
-							/* rules of promotion => passed as int, not char */
-							int c = va_arg(ap, int);
-							putc(c, stdout);
-							break;
-						}
+					{
+						/* rules of promotion => passed as int, not char */
+						int c = va_arg(ap, int);
+						putc(c, stdout);
+						break;
+					}
 					case 'd':
-						{
-							int d = va_arg(ap, int);
-							fprintf(stdout, "%d", d);
-							break;
-						}
+					{
+						int d = va_arg(ap, int);
+						fprintf(stdout, "%d", d);
+						break;
+					}
 					case 'f':
-						{
-							double f = va_arg(ap, double); /* passed as double, not float */
-							fprintf(stdout, "%f", f);
-							break;
-						}
+					{
+						double f = va_arg(ap, double); /* passed as double, not float */
+						fprintf(stdout, "%f", f);
+						break;
+					}
 					case 's':
-						{
-							char *s = va_arg(ap, char *);
-							fputs(s, stdout);
-							break;
-						}
+					{
+						char *s = va_arg(ap, char *);
+						fputs(s, stdout);
+						break;
+					}
 					case 'm':
-						{
-							int m = va_arg(ap, int);
-							int n = va_arg(ap, int);
-							gtp_print_vertex(m, n);
-							break;
-						}
+					{
+						int m = va_arg(ap, int);
+						int n = va_arg(ap, int);
+						gtp_print_vertex(m, n);
+						break;
+					}
 					case 'C':
-						{
-							int color = va_arg(ap, int);
-							if (color == WHITE)
-								fputs("white", stdout);
-							else if (color == BLACK)
-								fputs("black", stdout);
-							else
-								fputs("empty", stdout);
-							break;
-						}
+					{
+						int color = va_arg(ap, int);
+						if (color == WHITE)
+							fputs("white", stdout);
+						else if (color == BLACK)
+							fputs("black", stdout);
+						else
+							fputs("empty", stdout);
+						break;
+					}
 					default:
 						fprintf(stdout, "\n\nUnknown format character '%c'\n", *fmt);
 						break;
@@ -549,8 +553,8 @@ namespace Go
 			if (sscanf(s, "%6s%n", color_string, &n) != 1)
 				return 0;
 
-			for (i = 0; i < (int) strlen(color_string); i++)
-				color_string[i] = tolower((int) color_string[i]);
+			for (i = 0; i < (int)strlen(color_string); i++)
+				color_string[i] = tolower((int)color_string[i]);
 
 			if (strcmp(color_string, "b") == 0
 				|| strcmp(color_string, "black") == 0)
@@ -583,8 +587,8 @@ namespace Go
 				char buf[6];
 				if (sscanf(s + n1, "%5s%n", buf, &n2) != 1)
 					return 0;
-				for (k = 0; k < (int) strlen(buf); k++)
-					buf[k] = tolower((int) buf[k]);
+				for (k = 0; k < (int)strlen(buf); k++)
+					buf[k] = tolower((int)buf[k]);
 				if (strcmp(buf, "pass") != 0)
 					return 0;
 				*i = -1;
@@ -639,10 +643,10 @@ namespace Go
 		void sort_moves(int n, int movei[], int movej[])
 		{
 			int b, a;
-			for (b = n-1; b > 0; b--) {
+			for (b = n - 1; b > 0; b--) {
 				for (a = 0; a < b; a++) {
 					if (movei[a] > movei[b]
-					|| (movei[a] == movei[b] && movej[a] > movej[b])) {
+						|| (movei[a] == movei[b] && movej[a] > movej[b])) {
 						int tmp;
 						tmp = movei[b];
 						movei[b] = movei[a];
@@ -658,45 +662,45 @@ namespace Go
 		void letters(void)
 		{
 			int i;
-  
+
 			printf("  ");
 			for (i = 0; i < engine->get_board_size(); i++)
-			printf(" %c", 'A' + i + (i >= 8));
+				printf(" %c", 'A' + i + (i >= 8));
 		}
 		int place_handicap(char *s, int fixed)
 		{
-		  int handicap;
-		  int m, n;
-		  int first_stone = 1;
+			int handicap;
+			int m, n;
+			int first_stone = 1;
 
-		  if (!engine->board_empty())
-			return gtp_failure("board not empty");
+			if (!engine->board_empty())
+				return gtp_failure("board not empty");
 
-		  if (sscanf(s, "%d", &handicap) < 1)
-			return gtp_failure("handicap not an integer");
-  
-		  if (handicap < 2)
-			return gtp_failure("invalid handicap");
+			if (sscanf(s, "%d", &handicap) < 1)
+				return gtp_failure("handicap not an integer");
 
-		  if (fixed && !engine->valid_fixed_handicap(handicap))
-			return gtp_failure("invalid handicap");
+			if (handicap < 2)
+				return gtp_failure("invalid handicap");
 
-		  if (fixed)
-			engine->place_fixed_handicap(handicap);
-		  else
-			engine->place_free_handicap(handicap);
+			if (fixed && !engine->valid_fixed_handicap(handicap))
+				return gtp_failure("invalid handicap");
 
-		  gtp_start_response(GTP_SUCCESS);
-		  for (m = 0; m < engine->get_board_size(); m++)
-			for (n = 0; n < engine->get_board_size(); n++)
-			  if (engine->get_board(Point(m, n)) != EMPTY) {
-				if (first_stone)
-				  first_stone = 0;
-				else
-				  gtp_printf(" ");
-			  gtp_mprintf("%m", m, n);
-		  }
-		  return gtp_finish_response();
+			if (fixed)
+				engine->place_fixed_handicap(handicap);
+			else
+				engine->place_free_handicap(handicap);
+
+			gtp_start_response(GTP_SUCCESS);
+			for (m = 0; m < engine->get_board_size(); m++)
+				for (n = 0; n < engine->get_board_size(); n++)
+				if (engine->get_board(Point(m, n)) != EMPTY) {
+					if (first_stone)
+						first_stone = 0;
+					else
+						gtp_printf(" ");
+					gtp_mprintf("%m", m, n);
+				}
+			return gtp_finish_response();
 		}
 	};
 	GTP *GTP::_instance = NULL;

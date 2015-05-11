@@ -8,6 +8,7 @@
 #define _EATER_H_
 
 #include "naiveSimulator.h"
+#include <omp.h>
 
 namespace Go
 {
@@ -24,19 +25,26 @@ namespace Go
 				for (auto p : moves)
 				{
 					for (int k = 0; k < 4; k++) {
-						Point a = p+delta[k];
+						Point a = p + delta[k];
 						if (on_board(a)
 							&& get_board(a) == other_color(color)) {
-								int liberty = count_liberty(a);
-								if (liberty < min_liberty || liberty == min_liberty && pos_evaluate(p) > pos_evaluate(move)) {
-									move = p;
-									min_liberty = liberty;
-								}
+							int liberty = count_liberty(a);
+							if (liberty < min_liberty || liberty == min_liberty && pos_evaluate(p) > pos_evaluate(move)) {
+								move = p;
+								min_liberty = liberty;
+							}
 						}
 					}
 				}
-				if (move == Point(-1, -1))
-					move = moves[rand()%moves.size()];
+				if (move == Point(-1, -1)) {
+					int r = rand();
+					if (omp_get_thread_num() != 0)
+					{
+						r += omp_get_thread_num() * 1664525 + 1013904223;
+					}
+					r %= moves.size();
+					move = moves[r];
+				}
 			}
 			log_format("best (%d,%d) -> %d", move.r, move.c, min_liberty);
 

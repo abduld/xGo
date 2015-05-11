@@ -17,12 +17,12 @@ namespace Go
 		class BoardData : public NaiveSimulator {
 		public:
 			BoardData() {}
-			BoardData(BoardData &other) {*this = other;}
+			BoardData(BoardData &other) { *this = other; }
 			BoardData& operator=(BoardData &other) {
 				NaiveSimulator::operator=(other);
 				return *this;
 			}
-			override Point generate_move(int color) {return Point(-1, -1);}
+			override Point generate_move(int color) { return Point(-1, -1); }
 		};
 		class Minmax : public BoardData
 		{
@@ -63,7 +63,7 @@ namespace Go
 					lastMove = move;
 
 					board.play_move(move, color);
-					int score = -alpha_beta_search(board, other_color(color), -beta, -alpha, depth+1);
+					int score = -alpha_beta_search(board, other_color(color), -beta, -alpha, depth + 1);
 					board.undo();
 					//nextBoard.undo();
 					//if (!(board == nextBoard))
@@ -91,7 +91,7 @@ namespace Go
 					bool flag = false;
 
 					for (int i = -2; i <= 2; i++) {
-						int tmp = 2-std::abs(i);
+						int tmp = 2 - std::abs(i);
 						for (int j = -tmp; j <= tmp; j++) {
 							Point a = move + Point(i, j);
 							if (board.on_board(a) && (board.get_board(a) == color || board.get_board(a) == board.other_color(color))) {
@@ -105,7 +105,7 @@ namespace Go
 
 				if (moves.empty()) {
 					if (legal_moves.size() == board_size*board_size) {
-						moves.push_back(Point(board_size/2, board_size/2));
+						moves.push_back(Point(board_size / 2, board_size / 2));
 						return moves;
 					}
 					return legal_moves;
@@ -118,10 +118,10 @@ namespace Go
 
 				for (int i = 0; i < board_size; i++)
 					for (int j = 0; j < board_size; j++)
-						if (board.board[i][j] == color)
-							score += 10;
-						else if (board.board[i][j] == other)
-							score -= 10;
+					if (board.board[i][j] == color)
+					score += 10;
+					else if (board.board[i][j] == other)
+						score -= 10;
 
 				point_set visited;
 				for (int i = 0; i < board_size; i++)
@@ -129,15 +129,15 @@ namespace Go
 						Point p(i, j);
 						if (visited.find(p) == visited.end())
 							if (board.get_board(p) != EMPTY) {
-								int factor = (board.get_board(p) == color)?1:-1;
+								int factor = (board.get_board(p) == color) ? 1 : -1;
 								int count = 0, liberty = 0;
 								point_set liberty_set;
-								board.map_string(p, [&](Point q){
-									count ++;
+								board.map_string(p, [&](Point q) {
+									count++;
 									visited.insert(q);
 									for (int k = 0; k < 4; k++) {
-										Point b = q+delta[k];
-										if (board.on_board(b) && board.get_board(b) == EMPTY && liberty_set.find(b)==liberty_set.end()) {
+										Point b = q + delta[k];
+										if (board.on_board(b) && board.get_board(b) == EMPTY && liberty_set.find(b) == liberty_set.end()) {
 											liberty++;
 											liberty_set.insert(b);
 										}
@@ -153,27 +153,27 @@ namespace Go
 								score += factor*count * 5;
 								score += factor*liberty * 2;
 							}
-							/*else {
-								int count = 0, our = 0, enemy = 0;
-								board.flood_fill(p, [&](Point q){
-									visited.insert(q);
-									if (board.get_board(q) == EMPTY)
-										count++;
-									else if (board.get_board(q) == color)
-										our++;
-									else
-										enemy++;
-									return true;
-								});
+						/*else {
+							int count = 0, our = 0, enemy = 0;
+							board.flood_fill(p, [&](Point q){
+								visited.insert(q);
+								if (board.get_board(q) == EMPTY)
+									count++;
+								else if (board.get_board(q) == color)
+									our++;
+								else
+									enemy++;
+								return true;
+							});
 
-								int factor = 0;
-								if (our == 0 && enemy > 0)
-									factor = -1, count += enemy;
-								else if (enemy == 0 && our > 0)
-									factor = 1, count += our;
+							int factor = 0;
+							if (our == 0 && enemy > 0)
+								factor = -1, count += enemy;
+							else if (enemy == 0 && our > 0)
+								factor = 1, count += our;
 
-								score += factor * count * 10;
-							}*/
+							score += factor * count * 10;
+						}*/
 					}
 
 				return score;

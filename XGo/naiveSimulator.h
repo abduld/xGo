@@ -9,6 +9,7 @@
 
 #include <functional>
 #include "engine.h"
+#include <algorithm>
 
 namespace Go
 {
@@ -147,8 +148,8 @@ namespace Go
 		override bool board_empty() {
 			for (int i = 0; i < board_size; i++)
 				for (int j = 0; j < board_size; j++)
-					if (board[i][j] != EMPTY)
-						return 0;
+				if (board[i][j] != EMPTY)
+				return 0;
 			return 1;
 		}
 		override int get_board(Point p) {
@@ -222,7 +223,7 @@ namespace Go
 			*/
 			if (suicide(p, color)) {
 				for (int k = 0; k < 4; k++) {
-					Point a = p+delta[k];
+					Point a = p + delta[k];
 					if (on_board(a) && get_board(a) == color)
 						remove_string(a);
 				}
@@ -231,7 +232,7 @@ namespace Go
 
 			/* Not suicide. Remove captured opponent strings. */
 			for (int k = 0; k < 4; k++) {
-				Point a = p+delta[k];
+				Point a = p + delta[k];
 				if (on_board(a)
 					&& get_board(a) == other_color(color)
 					&& !has_additional_liberty(a, p))
@@ -248,7 +249,7 @@ namespace Go
 			* together.
 			*/
 			for (int k = 0; k < 4; k++) {
-				Point a = p+delta[k];
+				Point a = p + delta[k];
 				/* Make sure that the stones are not already linked together. This
 				* may happen if the same string neighbors the new stone in more
 				* than one direction.
@@ -300,8 +301,8 @@ namespace Go
 			* check the color of at least one neighbor.
 			*/
 			if (p == ko
-				&& ((on_board(p+delta[0]) && get_board(p+delta[0]) == other)
-				|| (on_board(p+delta[1]) && get_board(p+delta[1]) == other)))
+				&& ((on_board(p + delta[0]) && get_board(p + delta[0]) == other)
+					|| (on_board(p + delta[1]) && get_board(p + delta[1]) == other)))
 				return 0;
 
 			return 1;
@@ -310,7 +311,7 @@ namespace Go
 		override void compute_final_status() {
 			for (int i = 0; i < board_size; i++)
 				for (int j = 0; j < board_size; j++)
-					final_status[i][j] = UNKNOWN;
+				final_status[i][j] = UNKNOWN;
 
 			for (int i = 0; i < board_size; i++)
 				for (int j = 0; j < board_size; j++) {
@@ -370,7 +371,7 @@ namespace Go
 
 	public:
 		/* Basic Utility */
-		static int other_color(int color)  {
+		static int other_color(int color) {
 			return (WHITE + BLACK - (color));
 		}
 		std::string get_color_str(int color) const {
@@ -395,10 +396,10 @@ namespace Go
 			int cnt = 0;
 			for (int i = 0; i < board_size; i++)
 				for (int j = 0; j < board_size; j++)
-					if (board[i][j] == other_color(color))
-						cnt++;
-					else if (board[i][j] != EMPTY)
-						return false;
+				if (board[i][j] == other_color(color))
+				cnt++;
+				else if (board[i][j] != EMPTY)
+					return false;
 			return cnt <= 1;
 		}
 		int get_color(Point p) const {
@@ -429,12 +430,12 @@ namespace Go
 		bool suicide(Point p, int color)
 		{
 			for (int k = 0; k < 4; k++)
-				if (provides_liberty(p+delta[k], p, color))
-					return false;
+				if (provides_liberty(p + delta[k], p, color))
+				return false;
 
 			return true;
 		}
-		// check if a point p is provided liberty from p, 
+		// check if a point p is provided liberty from p,
 		// a special case is that a is unfriendly but it's captured by p
 		bool provides_liberty(Point a, Point p, int color)
 		{
@@ -463,7 +464,7 @@ namespace Go
 			Point pos = p;
 			do {
 				for (int k = 0; k < 4; k++) {
-					Point b = pos+delta[k];
+					Point b = pos + delta[k];
 					if (on_board(b) && get_board(b) == EMPTY && (b.r != lib.r || b.c != lib.c))
 						return true;
 				}
@@ -481,8 +482,8 @@ namespace Go
 			point_set hash;
 			do {
 				for (int k = 0; k < 4; k++) {
-					Point b = pos+delta[k];
-					if (on_board(b) && get_board(b) == EMPTY && hash.find(b)==hash.end()) {
+					Point b = pos + delta[k];
+					if (on_board(b) && get_board(b) == EMPTY && hash.find(b) == hash.end()) {
 						cnt++;
 						hash.insert(b);
 					}
@@ -498,8 +499,8 @@ namespace Go
 			point_set hash;
 			do {
 				for (int k = 0; k < 4; k++) {
-					Point b = pos+delta[k];
-					if (on_board(b) && get_board(b) == EMPTY && hash.find(b)==hash.end()) {
+					Point b = pos + delta[k];
+					if (on_board(b) && get_board(b) == EMPTY && hash.find(b) == hash.end()) {
 						hash.insert(b);
 					}
 				}
@@ -509,8 +510,8 @@ namespace Go
 
 			int cnt = -1;
 			for (int k = 0; k < 4; k++) {
-				Point b = lib+delta[k];
-				if (on_board(b) && get_board(b) == EMPTY && hash.find(b)==hash.end()) {
+				Point b = lib + delta[k];
+				if (on_board(b) && get_board(b) == EMPTY && hash.find(b) == hash.end()) {
 					cnt++;
 					hash.insert(b);
 				}
@@ -571,8 +572,8 @@ namespace Go
 				cnt++;
 
 				for (int k = 0; k < 4; k++) {
-					Point b = pos+delta[k];
-					if (on_board(b) && get_board(b) == EMPTY && hash.find(b)==hash.end()) {
+					Point b = pos + delta[k];
+					if (on_board(b) && get_board(b) == EMPTY && hash.find(b) == hash.end()) {
 						liberty++;
 						hash.insert(b);
 					}
@@ -597,7 +598,7 @@ namespace Go
 			queue.push_back(p);
 
 			int index = 0;
-			while(index < queue.size()) {
+			while (index < queue.size()) {
 				Point pos = queue[index++];
 				if (!cb(pos))
 					break;
@@ -635,24 +636,24 @@ namespace Go
 				for (int aj = 0; aj < board_size; aj++) {
 					Point a(ai, aj);
 					/* Consider moving at (ai, aj) if it is legal and not suicide. */
-					
+
 					if (legal_move(a, color)
 						&& !suicide(a, color)) {
-							/* Further require the move not to be suicide for the opponent... */
-							if (!suicide(a, other_color(color)))
-								moves.push_back(a);
-							else {
-								/* ...however, if the move captures at least one stone,
-								* consider it anyway.
-								*/
-								for (int k = 0; k < 4; k++) {
-									Point b = a+delta[k];
-									if (on_board(b) && get_board(b) == other_color(color)) {
-										moves.push_back(a);
-										break;
-									}
+						/* Further require the move not to be suicide for the opponent... */
+						if (!suicide(a, other_color(color)))
+							moves.push_back(a);
+						else {
+							/* ...however, if the move captures at least one stone,
+							* consider it anyway.
+							*/
+							for (int k = 0; k < 4; k++) {
+								Point b = a + delta[k];
+								if (on_board(b) && get_board(b) == other_color(color)) {
+									moves.push_back(a);
+									break;
 								}
 							}
+						}
 					}
 				}
 
@@ -663,13 +664,13 @@ namespace Go
 			if (!on_board(p))
 				return -1;
 			else
-				return (board_size-std::min(p.r, board_size-p.r-1)) + (board_size-std::min(p.c, board_size-p.c-1));
+				return (board_size - std::min(p.r, board_size - p.r - 1)) + (board_size - std::min(p.c, board_size - p.c - 1));
 		}
 		// reconstruct the next_stone array
 		void reconstruct_next_stone() {
 			for (int i = 0; i < board_size; i++)
 				for (int j = 0; j < board_size; j++)
-					next_stone[i][j] = Point(i,j);
+				next_stone[i][j] = Point(i, j);
 			for (int i = 0; i < board_size; i++)
 				for (int j = 0; j < board_size; j++) {
 					Point p = Point(i, j);
@@ -687,13 +688,13 @@ namespace Go
 			if (color == BLACK) {
 				if (final_status[p.r][p.c] == BLACK_TERRITORY)
 					return true;
-				if (board[p.r][p.c] != EMPTY && (board[p.r][p.c] == WHITE ^ final_status[p.r][p.c] == ALIVE))
+				if (board[p.r][p.c] != EMPTY && ((board[p.r][p.c] == WHITE) ^ (final_status[p.r][p.c] == ALIVE)))
 					return true;
 			}
-			else if (color == WHITE)  {
+			else if (color == WHITE) {
 				if (final_status[p.r][p.c] == WHITE_TERRITORY)
 					return true;
-				if (board[p.r][p.c] != EMPTY && (board[p.r][p.c] == BLACK ^ final_status[p.r][p.c] == ALIVE))
+				if (board[p.r][p.c] != EMPTY && ((board[p.r][p.c] == BLACK) ^ (final_status[p.r][p.c] == ALIVE)))
 					return true;
 			}
 			return false;

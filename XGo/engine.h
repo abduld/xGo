@@ -11,6 +11,13 @@
 #include <fstream>
 #include "basic.h"
 
+#ifdef _MSC_VER
+#define _CRT_SECURE_NO_WARNINGS
+#pragma warning(disable : 4996)
+#endif
+
+#define INDEBUG(...) //__VA_ARGS__
+
 namespace Go
 {
 	class Engine
@@ -20,7 +27,7 @@ namespace Go
 		float komi;
 		int board_size;
 	public:
-		Engine(int board_size = 6, float komi = -3.14):board_size(board_size), komi(komi) {
+		Engine(int board_size = 6, float komi = -3.14) :board_size(board_size), komi(komi) {
 		}
 		virtual ~Engine() {
 			if (log) {
@@ -28,7 +35,7 @@ namespace Go
 				log.close();
 			}
 		}
-		
+
 		int get_board_size() const { return board_size; }
 		void set_board_size(int val) { board_size = val; }
 		float get_komi() const { return komi; }
@@ -52,7 +59,7 @@ namespace Go
 		virtual void log_format(const char* fmt, ...)
 		{
 			va_list arg;
-			char buffer[1024] = {0};
+			char buffer[1024] = { 0 };
 
 			va_start(arg, fmt);
 			vsprintf(buffer, fmt, arg);

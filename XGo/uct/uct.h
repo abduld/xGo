@@ -16,7 +16,6 @@
 namespace Go
 {
 	namespace UCT {
-
 		template<typename Policy>
 		class UCT : public MonteCarlo
 		{
@@ -24,7 +23,7 @@ namespace Go
 			Policy policy;
 			TreeNode *root;
 		public:
-			UCT():root(NULL) {}
+			UCT() :root(NULL) {}
 			virtual ~UCT() {
 				if (root) {
 					delete root;
@@ -41,10 +40,10 @@ namespace Go
 
 				int cnt = 0;
 				long now = clock();
-				long limit_time = now + CLOCKS_PER_SEC * (is_first(color)?InitTimeLimit:TimeLimit);
+				long limit_time = now + CLOCKS_PER_SEC * (is_first(color) ? InitTimeLimit : TimeLimit);
 
 				//for (int i = 0; i < 100; i++)
-				while(clock() < limit_time) 
+				while (clock() < limit_time && cnt < 100)
 				{
 					now = clock();
 					cnt++;
@@ -61,17 +60,17 @@ namespace Go
 						break;
 
 					float value = p->monteCarlo(board, policy);
-					p->update(value>0.5f, value);
-					
+					p->update(value > 0.5f, value);
+
 					if (p->is_mature()) {
-						printf("expand...\n");
+						INDEBUG(printf("expand...\n"));
 						p->expand(board, policy);
 					}
 
-					printf("round %d, cost time: %f\n", cnt, float(clock()-now)/CLOCKS_PER_SEC);
+					INDEBUG(printf("round %d, cost time: %f\n", cnt, float(clock() - now) / CLOCKS_PER_SEC));
 				}
 
-				log_format("total simulate: %d, total nodes: %d, best val: %f", cnt, root->node_count(), root->value());
+				INDEBUG(log_format("total simulate: %d, total nodes: %d, best val: %f", cnt, root->node_count(), root->value()));
 
 				Point move(-1, -1);
 				if (!root->is_leaf()) {
@@ -98,7 +97,7 @@ namespace Go
 						node->parent = NULL;
 					}
 				}
-				
+
 				delete root;
 				// set new root
 				root = node;

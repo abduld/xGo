@@ -8,6 +8,7 @@
 #define _BROWN_H_
 
 #include "naiveSimulator.h"
+#include <omp.h>
 
 namespace Go
 {
@@ -23,21 +24,21 @@ namespace Go
 					/* Consider moving at (ai, aj) if it is legal and not suicide. */
 					if (legal_move(a, color)
 						&& !suicide(a, color)) {
-							/* Further require the move not to be suicide for the opponent... */
-							if (!suicide(a, other_color(color)))
-								moves.push_back(a);
-							else {
-								/* ...however, if the move captures at least one stone,
-								* consider it anyway.
-								*/
-								for (int k = 0; k < 4; k++) {
-									Point b = a+delta[k];
-									if (on_board(b) && get_board(b) == other_color(color)) {
-										moves.push_back(a);
-										break;
-									}
+						/* Further require the move not to be suicide for the opponent... */
+						if (!suicide(a, other_color(color)))
+							moves.push_back(a);
+						else {
+							/* ...however, if the move captures at least one stone,
+							* consider it anyway.
+							*/
+							for (int k = 0; k < 4; k++) {
+								Point b = a + delta[k];
+								if (on_board(b) && get_board(b) == other_color(color)) {
+									moves.push_back(a);
+									break;
 								}
 							}
+						}
 					}
 				}
 
@@ -55,7 +56,7 @@ namespace Go
 					Point p = moves[i];
 					int sum_captured = 0;
 					for (int k = 0; k < 4; k++) {
-						Point a = p+delta[k];
+						Point a = p + delta[k];
 						if (on_board(a)
 							&& get_board(a) == other_color(color)
 							&& !has_additional_liberty(a, p))
@@ -71,7 +72,13 @@ namespace Go
 						best.push_back(p);
 				}
 
-				move = best[rand()%best.size()];
+				int r = rand();
+				if (omp_get_thread_num() != 0)
+				{
+					r += omp_get_thread_num() * 1664525 + 1013904223;
+				}
+				r %= best.size();
+				move = best[r];
 			}
 
 			return move;

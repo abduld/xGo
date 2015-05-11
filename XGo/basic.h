@@ -16,18 +16,18 @@ namespace Go
 	public:
 		int r;
 		int c;
-		Point(int r = -1, int c = -1):r(r),c(c) {}
+		Point(int r = -1, int c = -1) :r(r), c(c) {}
 		friend Point operator+(const Point &a, const Point &b) {
-			return Point(a.r+b.r, a.c+b.c);
+			return Point(a.r + b.r, a.c + b.c);
 		}
 		friend Point operator-(const Point &a, const Point &b) {
-			return Point(a.r-b.r,a.c-b.c);
+			return Point(a.r - b.r, a.c - b.c);
 		}
 		friend bool operator==(const Point &a, const Point &b) {
-			return a.r==b.r&&a.c==b.c;
+			return a.r == b.r&&a.c == b.c;
 		}
 		friend bool operator!=(const Point &a, const Point &b) {
-			return !(a==b);
+			return !(a == b);
 		}
 	};
 
@@ -41,11 +41,11 @@ namespace Go
 
 	typedef std::unordered_set<Point, PointHasher> point_set;
 
-	enum Color {EMPTY = 0, WHITE = 1, BLACK = 2};
-	enum FinalStatus {DEAD, ALIVE, SEKI, WHITE_TERRITORY, BLACK_TERRITORY, UNKNOWN};
+	enum Color { EMPTY = 0, WHITE = 1, BLACK = 2 };
+	enum FinalStatus { DEAD, ALIVE, SEKI, WHITE_TERRITORY, BLACK_TERRITORY, UNKNOWN };
 	const int MIN_BOARD = 2;
 	const int MAX_BOARD = 23;
-	#define override 
+#define override
 }
 
 #endif
