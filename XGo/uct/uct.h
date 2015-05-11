@@ -43,7 +43,7 @@ namespace Go
 				long limit_time = now + CLOCKS_PER_SEC * (is_first(color) ? InitTimeLimit : TimeLimit);
 
 				//for (int i = 0; i < 100; i++)
-				while (clock() < limit_time && cnt < 100)
+				while (clock() < limit_time)
 				{
 					now = clock();
 					cnt++;
@@ -70,7 +70,7 @@ namespace Go
 					INDEBUG(printf("round %d, cost time: %f\n", cnt, float(clock() - now) / CLOCKS_PER_SEC));
 				}
 
-				INDEBUG(log_format("total simulate: %d, total nodes: %d, best val: %f", cnt, root->node_count(), root->value()));
+				log_format("total simulate: %d, total nodes: %d, best val: %f", cnt, root->node_count(), root->value());
 
 				Point move(-1, -1);
 				if (!root->is_leaf()) {

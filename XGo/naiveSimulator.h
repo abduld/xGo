@@ -47,9 +47,9 @@ namespace Go
 		Point delta[4];
 
 		std::vector<Point> legal_moves;
-		short board[MAX_BOARD][MAX_BOARD];
+		char board[MAX_BOARD][MAX_BOARD];
 		Point next_stone[MAX_BOARD][MAX_BOARD];
-		short final_status[MAX_BOARD][MAX_BOARD];
+		char final_status[MAX_BOARD][MAX_BOARD];
 		LogNode logger;
 		std::vector<LogNode> history;
 	public:
@@ -70,7 +70,7 @@ namespace Go
 
 			this->board_size = other.board_size;
 
-			memcpy(this->board, other.board, sizeof(short)*MAX_BOARD*MAX_BOARD);
+			memcpy(this->board, other.board, sizeof(char)*MAX_BOARD*MAX_BOARD);
 			memcpy(this->next_stone, other.next_stone, sizeof(Point)*MAX_BOARD*MAX_BOARD);
 			this->ko = other.ko;
 			this->history = other.history;
@@ -390,7 +390,7 @@ namespace Go
 		}
 		bool on_board(Point p)
 		{
-			return p.r >= 0 && p.r < board_size && p.c >= 0 && p.c < board_size;
+			return p.r >= 0 && p.c >= 0 && p.r < board_size &&p.c < board_size;
 		}
 		bool is_first(int color) const {
 			int cnt = 0;
